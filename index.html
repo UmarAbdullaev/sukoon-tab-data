@@ -79,7 +79,7 @@
   </head>
   <body>
     <h1>Privacy Policy</h1>
-    <p class="updated">Last updated: June 16, 2026</p>
+    <p class="updated">Last updated: October 8, 2026</p>
 
     <p>
       Sukoon Tab (“we”, “the extension”) is a Chrome new tab extension. This policy describes what
@@ -129,14 +129,20 @@
       </li>
       <li>
         <strong>Saved favorites</strong> — ayahs, hadiths, and duas you save with Sukoon Tab Plus,
-        stored locally on your device.
+        stored locally on your device. With favorites sync on (the default for Plus), a list of
+        references to them (type, id, save time; not the text) is also kept in Chrome sync storage so
+        it follows your Chrome profile.
       </li>
       <li>
-        <strong>Location coordinates</strong> — latitude and longitude only, stored locally when you
-        allow location access for prayer times or weather.
+        <strong>Location coordinates</strong> — latitude, longitude and a city name, stored locally when
+        you allow location access or choose a city for prayer times or weather.
       </li>
       <li>
         <strong>Shortcuts</strong> — links you add on the new tab page, stored locally.
+      </li>
+      <li>
+        <strong>Custom background image</strong> — if you choose your own background, a resized copy
+        is stored locally on this device only. It is never uploaded or synced.
       </li>
       <li>
         <strong>Plus license data</strong> — if you activate Sukoon Tab Plus, your license key, a
@@ -148,12 +154,19 @@
     <h2>Geolocation</h2>
     <p>
       If you enable prayer times or weather, the extension may request your device location through
-      the browser’s geolocation API. This is used only to calculate prayer times, show approximate
-      local weather, and reverse-geocode a city label for display.
+      the browser’s geolocation API. This is used only to calculate prayer times and show approximate
+      local weather. The city name shown is looked up offline in a list bundled with the extension
+      (city data © <a href="https://www.geonames.org/" rel="noopener noreferrer">GeoNames</a>, CC BY
+      4.0); your coordinates are not sent to a geocoding service.
     </p>
     <p>
-      Coordinates are cached locally so the extension does not need to request location on every new
-      tab. You can deny location access; prayer times and weather will not work until location is
+      Instead of sharing your device location, you can search for your city in Settings. A chosen city
+      is saved on this device and is not refreshed in the background.
+    </p>
+    <p>
+      Coordinates are saved locally so the extension does not need to request location on every new
+      tab. While location access is allowed, they are refreshed in the background at most every 12
+      hours. You can deny location access; prayer times and weather will not work until location is
       available, or until you update location again from Settings after granting permission.
     </p>
     <p>We do not receive or store your location on our own servers.</p>
@@ -168,18 +181,11 @@
         are sent, not personal information.
       </li>
       <li>
-        <strong>Open-Meteo</strong> (<a href="https://open-meteo.com/" rel="noopener noreferrer"
-          >open-meteo.com</a
-        >) — fetches weather data when the weather widget is enabled (Sukoon Tab Plus). Requests
-        include approximate coordinates.
-      </li>
-      <li>
-        <strong>BigDataCloud</strong> (<a
-          href="https://www.bigdatacloud.com/"
-          rel="noopener noreferrer"
-          >bigdatacloud.com</a
-        >) — reverse-geocodes coordinates to a city name for display. Requests include approximate
-        coordinates.
+        <strong>MET Norway</strong> (<a href="https://api.met.no/" rel="noopener noreferrer"
+          >api.met.no</a
+        >) — fetches weather forecasts when the weather widget is enabled. Requests include
+        approximate coordinates (rounded to 4 decimals). Weather data from MET Norway is licensed
+        under CC BY 4.0.
       </li>
       <li>
         <strong>Dodo Payments</strong> (<a href="https://dodopayments.com/" rel="noopener noreferrer"
@@ -194,7 +200,8 @@
           >pages.github.com</a
         >) — may fetch an updated curated ayah reference list (Quran surah/ayah references only, no
         personal information). A bundled copy ships with the extension and is used if the remote file
-        is unavailable.
+        is unavailable. If you remove Sukoon Tab, Chrome opens a short feedback page hosted there; its
+        address includes only the extension version.
       </li>
     </ul>
     <p>
@@ -243,10 +250,17 @@
     <p>Sukoon Tab requests the following Chrome permissions:</p>
     <ul>
       <li><strong>storage</strong> — save settings, favorites, cache, shortcuts, and license data</li>
-      <li><strong>alarms</strong> — refresh daily content and re-check Plus license status</li>
+      <li><strong>alarms</strong> — re-check Plus license status once a day and time prayer notifications</li>
       <li><strong>geolocation</strong> — calculate prayer times and weather when enabled</li>
-      <li><strong>tabs</strong> — open Dodo Payments checkout in a new tab when you upgrade to Plus</li>
       <li><strong>favicon</strong> — show website icons for shortcuts you add</li>
+      <li>
+        <strong>notifications</strong> — show prayer time notifications if you turn them on in
+        Settings; they are created on your device from your saved location
+      </li>
+      <li>
+        <strong>search</strong> — send what you type in the search box to your browser's default
+        search engine; Sukoon Tab does not store or log your searches
+      </li>
     </ul>
 
     <h2>Children’s privacy</h2>

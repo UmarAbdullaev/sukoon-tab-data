@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sukoon Tab — Sorry to see you go</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+        --bg: #f6f4ef;
+        --card: #ffffff;
+        --text: #1a1f2e;
+        --muted: #5c6478;
+        --accent: #2f6f5e;
+        --border: rgba(26, 31, 46, 0.12);
+      }
+
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #12151c;
+          --card: #1a1f2e;
+          --text: #eef1f7;
+          --muted: #a8b0c2;
+          --accent: #6fbfae;
+          --border: rgba(238, 241, 247, 0.12);
+        }
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: system-ui, -apple-system, sans-serif;
+        line-height: 1.6;
+        margin: 0;
+        min-height: 100vh;
+        background: var(--bg);
+        color: var(--text);
+        display: grid;
+        place-items: center;
+        padding: 1.5rem;
+      }
+
+      main {
+        width: min(100%, 560px);
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 2rem;
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
+      }
+
+      h1 {
+        font-size: 1.5rem;
+        margin: 0 0 0.5rem;
+      }
+
+      .lead {
+        color: var(--muted);
+        margin: 0 0 1.5rem;
+      }
+
+      .reasons {
+        display: grid;
+        gap: 0.5rem;
+        margin: 0 0 1.5rem;
+        padding: 0;
+        list-style: none;
+      }
+
+      .reasons a {
+        display: block;
+        padding: 0.75rem 1rem;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        color: inherit;
+        text-decoration: none;
+      }
+
+      .reasons a:hover,
+      .reasons a:focus-visible {
+        border-color: var(--accent);
+      }
+
+      .primary {
+        display: inline-block;
+        border-radius: 10px;
+        padding: 0.75rem 1rem;
+        font-weight: 600;
+        background: var(--accent);
+        color: #fff;
+        text-decoration: none;
+      }
+
+      .note {
+        margin-top: 1.5rem;
+        font-size: 0.875rem;
+        color: var(--muted);
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Sorry to see you go</h1>
+      <p class="lead">
+        Thank you for trying Sukoon Tab. If you have a moment, tell us why you removed it. Each
+        option opens an email to the developer; you can add more detail before sending.
+      </p>
+
+      <ul class="reasons">
+        <li><a data-reason="Prayer times were wrong for my location" href="#">Prayer times were wrong for my location</a></li>
+        <li><a data-reason="I missed a feature" href="#">I missed a feature</a></li>
+        <li><a data-reason="It was slow or something broke" href="#">It was slow or something broke</a></li>
+        <li><a data-reason="I prefer my old new tab page" href="#">I prefer my old new tab page</a></li>
+      </ul>
+
+      <a class="primary" data-reason="Other feedback" href="#">Write to us</a>
+
+      <p class="note">
+        Your settings were removed with the extension. Nothing is sent unless you send the email
+        yourself.
+      </p>
+    </main>
+
+    <script>
+      const CONTACT_EMAIL = "umarabdullaev151@gmail.com";
+      // Chrome opens this page with ?v=<version>; it is the only thing the address carries.
+      const version = (new URLSearchParams(window.location.search).get("v") || "").slice(0, 20);
+
+      for (const link of document.querySelectorAll("[data-reason]")) {
+        const subject = `Sukoon Tab feedback: ${link.dataset.reason}`;
+        const body = `\n\n---\nSukoon Tab version: ${version || "unknown"}`;
+        link.href = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+      }
+    </script>
+  </body>
+</html>

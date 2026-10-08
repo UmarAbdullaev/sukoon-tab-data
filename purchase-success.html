@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sukoon Tab Plus — Purchase complete</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+        --bg: #f6f4ef;
+        --card: #ffffff;
+        --text: #1a1f2e;
+        --muted: #5c6478;
+        --accent: #2f6f5e;
+        --border: rgba(26, 31, 46, 0.12);
+      }
+
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #12151c;
+          --card: #1a1f2e;
+          --text: #eef1f7;
+          --muted: #a8b0c2;
+          --accent: #6fbfae;
+          --border: rgba(238, 241, 247, 0.12);
+        }
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: system-ui, -apple-system, sans-serif;
+        line-height: 1.6;
+        margin: 0;
+        min-height: 100vh;
+        background: var(--bg);
+        color: var(--text);
+        display: grid;
+        place-items: center;
+        padding: 1.5rem;
+      }
+
+      main {
+        width: min(100%, 560px);
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 2rem;
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
+      }
+
+      h1 {
+        font-size: 1.5rem;
+        margin: 0 0 0.5rem;
+      }
+
+      .lead {
+        color: var(--muted);
+        margin: 0 0 1.5rem;
+      }
+
+      .key-box {
+        display: grid;
+        gap: 0.75rem;
+        margin: 1.25rem 0 1.75rem;
+      }
+
+      .key-box label {
+        font-size: 0.875rem;
+        font-weight: 600;
+      }
+
+      .key-row {
+        display: flex;
+        gap: 0.5rem;
+      }
+
+      .key-row input {
+        flex: 1;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        font-size: 0.875rem;
+        padding: 0.75rem 0.875rem;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        background: transparent;
+        color: inherit;
+      }
+
+      .key-row button,
+      .steps a {
+        border: 0;
+        border-radius: 10px;
+        padding: 0.75rem 1rem;
+        font: inherit;
+        font-weight: 600;
+        cursor: pointer;
+        background: var(--accent);
+        color: #fff;
+        text-decoration: none;
+        white-space: nowrap;
+      }
+
+      .steps {
+        margin: 0;
+        padding-left: 1.25rem;
+      }
+
+      .steps li {
+        margin-bottom: 0.5rem;
+      }
+
+      .note {
+        margin-top: 1.5rem;
+        font-size: 0.875rem;
+        color: var(--muted);
+      }
+
+      .status {
+        padding: 0.875rem 1rem;
+        border-radius: 10px;
+        background: rgba(47, 111, 94, 0.12);
+        margin-bottom: 1rem;
+      }
+
+      .status--pending {
+        background: rgba(92, 100, 120, 0.12);
+      }
+
+      .hidden {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <div id="status-success" class="status hidden">
+        Payment successful. Your Sukoon Tab Plus license is ready.
+      </div>
+      <div id="status-pending" class="status status--pending hidden">
+        Thanks for your purchase. Check your email for your license key if it is not shown below.
+      </div>
+
+      <h1>Activate Sukoon Tab Plus</h1>
+      <p class="lead">Unlock weather and saved favorites in your new tab.</p>
+
+      <div class="key-box">
+        <label for="license-key">Your license key</label>
+        <div class="key-row">
+          <input id="license-key" type="text" readonly spellcheck="false" autocomplete="off" />
+          <button type="button" id="copy-key">Copy</button>
+        </div>
+      </div>
+
+      <ol class="steps">
+        <li>Open a new tab with Sukoon Tab installed</li>
+        <li>Open <strong>Settings</strong> (gear icon)</li>
+        <li>Scroll to <strong>Sukoon Tab Plus</strong></li>
+        <li>Paste your license key and click <strong>Activate Plus</strong></li>
+      </ol>
+
+      <p class="note">
+        You can also find your license key in the purchase confirmation email. Each key supports up
+        to three browser activations.
+      </p>
+    </main>
+
+    <script>
+      const params = new URLSearchParams(window.location.search);
+      const licenseKey = (params.get("license_key") || "").trim();
+      const status = (params.get("status") || "").toLowerCase();
+      const input = document.getElementById("license-key");
+      const copyButton = document.getElementById("copy-key");
+      const successBanner = document.getElementById("status-success");
+      const pendingBanner = document.getElementById("status-pending");
+
+      if (licenseKey) {
+        input.value = licenseKey;
+        successBanner.classList.remove("hidden");
+      } else {
+        input.placeholder = "Check your email for your license key";
+        pendingBanner.classList.remove("hidden");
+        copyButton.disabled = true;
+      }
+
+      copyButton.addEventListener("click", async () => {
+        if (!input.value) return;
+
+        try {
+          await navigator.clipboard.writeText(input.value);
+          copyButton.textContent = "Copied!";
+          setTimeout(() => {
+            copyButton.textContent = "Copy";
+          }, 1800);
+        } catch {
+          input.select();
+          document.execCommand("copy");
+          copyButton.textContent = "Copied!";
+          setTimeout(() => {
+            copyButton.textContent = "Copy";
+          }, 1800);
+        }
+      });
+
+      if (status && status !== "succeeded" && status !== "active") {
+        pendingBanner.classList.remove("hidden");
+        successBanner.classList.add("hidden");
+      }
+    </script>
+  </body>
+</html>
