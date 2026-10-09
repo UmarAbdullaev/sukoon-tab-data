@@ -128,6 +128,47 @@
         background: rgba(92, 100, 120, 0.12);
       }
 
+      .status--error {
+        background: rgba(176, 58, 46, 0.14);
+      }
+
+      .one-click {
+        display: grid;
+        gap: 0.5rem;
+        margin: 0 0 1.5rem;
+      }
+
+      .one-click button {
+        border: 0;
+        border-radius: 10px;
+        padding: 0.875rem 1rem;
+        font: inherit;
+        font-weight: 600;
+        cursor: pointer;
+        background: var(--accent);
+        color: #fff;
+      }
+
+      .one-click button:disabled {
+        cursor: default;
+        opacity: 0.75;
+      }
+
+      .activate-result {
+        margin: 0;
+        font-size: 0.875rem;
+        color: var(--muted);
+      }
+
+      .activate-result--error {
+        color: #b03a2e;
+      }
+
+      h2 {
+        font-size: 1rem;
+        margin: 0 0 0.5rem;
+      }
+
       .hidden {
         display: none;
       }
@@ -136,14 +177,22 @@
   <body>
     <main>
       <div id="status-success" class="status hidden">
-        Payment successful. Your Sukoon Tab Plus license is ready.
+        Payment successful. Your Sukoon Tab Plus key is ready.
       </div>
       <div id="status-pending" class="status status--pending hidden">
-        Thanks for your purchase. Check your email for your license key if it is not shown below.
+        Thanks for your purchase. Your key is on its way to your email.
+      </div>
+      <div id="status-failed" class="status status--error hidden">
+        The payment didn't go through. You can try again from Sukoon Tab: Settings → Sukoon Tab Plus.
       </div>
 
       <h1>Activate Sukoon Tab Plus</h1>
-      <p class="lead">Unlock weather and saved favorites in your new tab.</p>
+      <p class="lead">Save your favorite ayahs, hadiths and duas in your new tab.</p>
+
+      <section id="one-click" class="one-click hidden">
+        <button type="button" id="activate-now">Activate in Sukoon Tab</button>
+        <p id="activate-result" class="activate-result" role="status"></p>
+      </section>
 
       <div class="key-box">
         <label for="license-key">Your license key</label>
@@ -153,60 +202,110 @@
         </div>
       </div>
 
+      <h2>To activate by hand</h2>
       <ol class="steps">
-        <li>Open a new tab with Sukoon Tab installed</li>
-        <li>Open <strong>Settings</strong> (gear icon)</li>
-        <li>Scroll to <strong>Sukoon Tab Plus</strong></li>
-        <li>Paste your license key and click <strong>Activate Plus</strong></li>
+        <li>Open a new tab in Chrome</li>
+        <li>Click <strong>Settings</strong> (the gear icon)</li>
+        <li>Choose <strong>Sukoon Tab Plus</strong> in the side menu</li>
+        <li>Paste your key and click <strong>Activate Plus</strong></li>
       </ol>
 
       <p class="note">
-        You can also find your license key in the purchase confirmation email. Each key supports up
-        to three browser activations.
+        Your key is also in your purchase email. It works on every computer where you use the same
+        Chrome profile.
       </p>
     </main>
 
     <script>
-      const params = new URLSearchParams(window.location.search);
-      const licenseKey = (params.get("license_key") || "").trim();
+      // Dodo Payments adds license_key, status and payment_id to this address. Every "?" after the
+      // first is read as "&", in case they were added after the extension's own `ext` with a "?".
+      const params = new URLSearchParams(window.location.search.slice(1).replace(/\?/g, "&"));
+      const licenseKey = (params.get("license_key") || "").split(",")[0].trim();
       const status = (params.get("status") || "").toLowerCase();
+      // The extension that opened the checkout; Chrome extension ids are 32 letters a–p.
+      const extensionId = /^[a-p]{32}$/.test(params.get("ext") || "") ? params.get("ext") : "";
+
       const input = document.getElementById("license-key");
       const copyButton = document.getElementById("copy-key");
-      const successBanner = document.getElementById("status-success");
-      const pendingBanner = document.getElementById("status-pending");
+      const oneClick = document.getElementById("one-click");
+      const activateButton = document.getElementById("activate-now");
+      const activateResult = document.getElementById("activate-result");
+      const show = (id) => document.getElementById(id).classList.remove("hidden");
+
+      if (status === "failed" || status === "cancelled") {
+        show("status-failed");
+      } else if (licenseKey && (!status || status === "succeeded" || status === "active")) {
+        show("status-success");
+      } else {
+        show("status-pending");
+      }
 
       if (licenseKey) {
         input.value = licenseKey;
-        successBanner.classList.remove("hidden");
       } else {
         input.placeholder = "Check your email for your license key";
-        pendingBanner.classList.remove("hidden");
         copyButton.disabled = true;
       }
+
+      // chrome.runtime exists on this page only when an extension lists it under
+      // externally_connectable, as Sukoon Tab does.
+      const runtime = window.chrome && window.chrome.runtime;
+
+      function sendToExtension(message) {
+        return new Promise((resolve) => {
+          try {
+            runtime.sendMessage(extensionId, message, (reply) => {
+              resolve(runtime.lastError ? null : reply);
+            });
+          } catch {
+            resolve(null);
+          }
+        });
+      }
+
+      if (licenseKey && extensionId && runtime && runtime.sendMessage) {
+        sendToExtension({ type: "plus:hello" }).then((reply) => {
+          if (reply && reply.ok) oneClick.classList.remove("hidden");
+        });
+      }
+
+      activateButton.addEventListener("click", async () => {
+        activateButton.disabled = true;
+        activateButton.textContent = "Activating…";
+        activateResult.classList.remove("activate-result--error");
+        activateResult.textContent = "";
+
+        const reply = await sendToExtension({ type: "plus:activate", licenseKey });
+        if (reply && reply.ok) {
+          activateResult.classList.remove("activate-result--error");
+          activateButton.textContent = "Plus is on";
+          activateResult.textContent =
+            "Done. Open a new tab and tap the heart on any card to save it.";
+          return;
+        }
+
+        activateButton.disabled = false;
+        activateButton.textContent = "Activate in Sukoon Tab";
+        activateResult.classList.add("activate-result--error");
+        activateResult.textContent =
+          (reply && reply.error) ||
+          "Couldn't reach Sukoon Tab. Copy your key and activate it by hand.";
+      });
 
       copyButton.addEventListener("click", async () => {
         if (!input.value) return;
 
         try {
           await navigator.clipboard.writeText(input.value);
-          copyButton.textContent = "Copied!";
-          setTimeout(() => {
-            copyButton.textContent = "Copy";
-          }, 1800);
         } catch {
           input.select();
           document.execCommand("copy");
-          copyButton.textContent = "Copied!";
-          setTimeout(() => {
-            copyButton.textContent = "Copy";
-          }, 1800);
         }
+        copyButton.textContent = "Copied!";
+        setTimeout(() => {
+          copyButton.textContent = "Copy";
+        }, 1800);
       });
-
-      if (status && status !== "succeeded" && status !== "active") {
-        pendingBanner.classList.remove("hidden");
-        successBanner.classList.add("hidden");
-      }
     </script>
   </body>
 </html>

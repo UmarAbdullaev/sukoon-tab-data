@@ -79,7 +79,7 @@
   </head>
   <body>
     <h1>Privacy Policy</h1>
-    <p class="updated">Last updated: October 8, 2026</p>
+    <p class="updated">Last updated: October 9, 2026</p>
 
     <p>
       Sukoon Tab (“we”, “the extension”) is a Chrome new tab extension. This policy describes what
@@ -145,9 +145,11 @@
         is stored locally on this device only. It is never uploaded or synced.
       </li>
       <li>
-        <strong>Plus license data</strong> — if you activate Sukoon Tab Plus, your license key, a
-        browser-specific activation ID, activation label, and last validation timestamp are stored
-        locally. License data is <strong>not</strong> synced through Chrome Sync.
+        <strong>Plus license data</strong> — if you activate Sukoon Tab Plus, your license key, its
+        activation ID, an activation label, and the time it was last checked are saved in
+        <code>chrome.storage.sync</code>. With Chrome Sync on, they follow your Chrome profile, so one
+        activation covers every computer where you use that profile. Whether Plus is on is worked out
+        on each computer and stored locally.
       </li>
     </ul>
 
@@ -223,21 +225,26 @@
     <p>After purchase, Dodo Payments provides a license key by email. If you activate Plus in the extension:</p>
     <ul>
       <li>
-        The extension sends your <strong>license key</strong> and a
-        <strong>browser activation label</strong> to Dodo Payments to register this installation.
+        The extension sends your <strong>license key</strong> and an
+        <strong>activation label</strong> (a random name, not linked to you) to Dodo Payments to
+        register the activation.
       </li>
       <li>
         The extension periodically sends your license key and activation ID to Dodo Payments to
         confirm the license is still valid.
       </li>
       <li>
-        If you remove the license from Settings, the extension asks Dodo Payments to deactivate this
-        browser’s activation seat.
+        If you remove the license from Settings, the extension asks Dodo Payments to deactivate the
+        activation, freeing its seat.
       </li>
     </ul>
     <p>
       Checkout opens in a new browser tab on Dodo Payments’ website when you choose to upgrade. The
-      extension does not embed payment forms inside the new tab page.
+      extension does not embed payment forms inside the new tab page. The checkout address includes
+      the extension’s ID and which button you used (Settings or Saved), so that after paying you return
+      to our purchase page. That page shows your key and can pass it to the extension when you click
+      <strong>Activate in Sukoon Tab</strong>. The key goes from the page straight to the extension in
+      your browser; nothing is sent to us.
     </p>
     <p>
       Dodo Payments privacy information:
@@ -254,8 +261,8 @@
       <li><strong>geolocation</strong> — calculate prayer times and weather when enabled</li>
       <li><strong>favicon</strong> — show website icons for shortcuts you add</li>
       <li>
-        <strong>notifications</strong> — show prayer time notifications if you turn them on in
-        Settings; they are created on your device from your saved location
+        <strong>notifications</strong> (optional) — asked for only when you turn on prayer time
+        notifications in Settings; they are created on your device from your saved location
       </li>
       <li>
         <strong>search</strong> — send what you type in the search box to your browser's default
